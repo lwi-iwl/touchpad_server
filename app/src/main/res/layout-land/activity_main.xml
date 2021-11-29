@@ -48,6 +48,104 @@
                 android:orientation="horizontal">
 
                 <Button
+                    android:id="@+id/bf1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:text="f1" />
+
+                <Button
+                    android:id="@+id/bf2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:text="f2" />
+
+                <Button
+                    android:id="@+id/bf3"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:text="f3" />
+
+                <Button
+                    android:id="@+id/bf4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:text="f4" />
+
+                <Button
+                    android:id="@+id/bf5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:text="f5" />
+
+                <Button
+                    android:id="@+id/bf6"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:text="f6" />
+
+                <Button
+                    android:id="@+id/bf7"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:text="f7" />
+
+                <Button
+                    android:id="@+id/bf8"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:text="f8" />
+
+                <Button
+                    android:id="@+id/bf9"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:text="f9" />
+
+                <Button
+                    android:id="@+id/bf10"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:text="f10" />
+
+                <Button
+                    android:id="@+id/bf11"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:text="f11" />
+
+                <Button
+                    android:id="@+id/bf12"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:text="f12" />
+
+                <Button
+                    android:id="@+id/bprt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0"
+                    android:text="snap" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+
+                <Button
                     android:id="@+id/b1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -486,11 +584,11 @@
                     android:text="ctrl" />
 
                 <Button
-                    android:id="@+id/bpdel"
+                    android:id="@+id/bpesc"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="del" />
+                    android:text="esc" />
 
             </LinearLayout>
 

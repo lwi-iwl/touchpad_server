@@ -14,14 +14,9 @@ import android.os.Message;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.text.Editable;
-import android.text.InputType;
-import android.text.TextWatcher;
-import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -31,7 +26,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.UUID;
 
@@ -39,7 +33,6 @@ public class MainActivity extends AppCompatActivity {
 
     public static final int REQUEST_ENABLE_BT=1;
     BluetoothAdapter bluetoothAdapter;
-    //public static final UUID MY_UUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
     public static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     public static final int MESSAGE_READ=0;
     public static final int MESSAGE_WRITE=1;
@@ -100,6 +93,19 @@ public class MainActivity extends AppCompatActivity {
         start_accepting_connection();
         Button imageView = (Button) findViewById(R.id.touchpad);
         imageView.setOnTouchListener(myTouchListener);
+        ((Button) findViewById(R.id.bf1)).setOnTouchListener(keyboardTouch);
+        ((Button) findViewById(R.id.bf2)).setOnTouchListener(keyboardTouch);
+        ((Button) findViewById(R.id.bf3)).setOnTouchListener(keyboardTouch);
+        ((Button) findViewById(R.id.bf4)).setOnTouchListener(keyboardTouch);
+        ((Button) findViewById(R.id.bf5)).setOnTouchListener(keyboardTouch);
+        ((Button) findViewById(R.id.bf6)).setOnTouchListener(keyboardTouch);
+        ((Button) findViewById(R.id.bf7)).setOnTouchListener(keyboardTouch);
+        ((Button) findViewById(R.id.bf8)).setOnTouchListener(keyboardTouch);
+        ((Button) findViewById(R.id.bf9)).setOnTouchListener(keyboardTouch);
+        ((Button) findViewById(R.id.bf10)).setOnTouchListener(keyboardTouch);
+        ((Button) findViewById(R.id.bf11)).setOnTouchListener(keyboardTouch);
+        ((Button) findViewById(R.id.bf12)).setOnTouchListener(keyboardTouch);
+        ((Button) findViewById(R.id.bprt)).setOnTouchListener(keyboardTouch);
         ((Button) findViewById(R.id.b1)).setOnTouchListener(keyboardTouch);
         ((Button) findViewById(R.id.b2)).setOnTouchListener(keyboardTouch);
         ((Button) findViewById(R.id.b3)).setOnTouchListener(keyboardTouch);
@@ -158,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
         ((Button) findViewById(R.id.bspace)).setOnTouchListener(keyboardTouch);
         ((Button) findViewById(R.id.bpalt)).setOnTouchListener(keyboardTouch);
         ((Button) findViewById(R.id.bpctrl)).setOnTouchListener(keyboardTouch);
-        ((Button) findViewById(R.id.bpdel)).setOnTouchListener(keyboardTouch);
+        ((Button) findViewById(R.id.bpesc)).setOnTouchListener(keyboardTouch);
         ((Button) findViewById(R.id.gamepadt)).setOnTouchListener(myTouchListener);
         ((Button) findViewById(R.id.kup)).setOnTouchListener(keyTouch);
         ((Button) findViewById(R.id.kdown)).setOnTouchListener(keyTouch);
@@ -181,17 +187,22 @@ public class MainActivity extends AppCompatActivity {
                 System.out.println("EXCEPTION" +e.getMessage());
             }
     }
-
+    long oldKey;
     View.OnTouchListener keyboardTouch = new View.OnTouchListener() {
         @SuppressLint("DefaultLocale")
         @Override
         public boolean onTouch(View v, MotionEvent event) {
             switch (event.getActionMasked()) {
                 case MotionEvent.ACTION_DOWN:
+                    try {
+                        Thread.sleep(20);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                     String name = "CD";
                     name = name + (String) ((Button) v).getText();
-                    while (name.length()<7)
-                        name = name + "8";
+                    while (name.length() < 7)
+                        name = name + "a";
                     if ((mmOutStream != null))
                         try {
                             System.out.println(name);
@@ -202,10 +213,15 @@ public class MainActivity extends AppCompatActivity {
                         }
                     break;
                 case MotionEvent.ACTION_UP:
+                    try {
+                        Thread.sleep(20);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                     String nameup = "CU";
                     nameup = nameup + (String) ((Button) v).getText();
-                    while (nameup.length()<7)
-                        nameup = nameup + "8";
+                    while (nameup.length() < 7)
+                        nameup = nameup + "a";
                     if ((mmOutStream != null))
                         try {
                             System.out.println(nameup);
@@ -225,12 +241,14 @@ public class MainActivity extends AppCompatActivity {
         @SuppressLint("DefaultLocale")
         @Override
         public boolean onTouch(View v, MotionEvent event) {
+            Date date = new Date();
             switch (event.getActionMasked()) {
                 case MotionEvent.ACTION_DOWN:
+                    oldKey = date.getTime();
                     String name = "KD";
                     name = name + (String) ((Button) v).getText();
                     while (name.length()<7)
-                        name = name + "8";
+                        name = name + "a";
                     if ((mmOutStream != null))
                         try {
                             System.out.println(name);
@@ -241,10 +259,11 @@ public class MainActivity extends AppCompatActivity {
                         }
                     break;
                 case MotionEvent.ACTION_UP:
+                    oldKey = date.getTime();
                     String nameup = "KU";
                     nameup = nameup + (String) ((Button) v).getText();
                     while (nameup.length()<7)
-                        nameup = nameup + "8";
+                        nameup = nameup + "a";
                     if ((mmOutStream != null))
                         try {
                             System.out.println(nameup);
@@ -287,7 +306,7 @@ public class MainActivity extends AppCompatActivity {
 
     float dX, dY;
     float scroll;
-    long old, oldMove;
+    long old, oldMove, oldClick;
     int quantity = 0;
     View.OnTouchListener myTouchListener = new View.OnTouchListener(){
         @SuppressLint("DefaultLocale")
@@ -296,70 +315,84 @@ public class MainActivity extends AppCompatActivity {
             int pointerIndex = event.getActionIndex();
             System.out.println(pointerIndex);
             Date date = new Date();
+            long newTime = date.getTime();
+            if (newTime-oldKey>50)
             switch (event.getActionMasked()) {
                 case MotionEvent.ACTION_DOWN:
-                        dX = event.getRawX();
-                        dY = event.getRawY();
-                        if (isAClick(old, date.getTime())) {
+                    dX = event.getRawX();
+                    dY = event.getRawY();
+                    if (isAClick(old, newTime)) {
+                        if (mmOutStream != null)
+                            try {
+                                System.out.println("LEFTDOWN");
+                                mmOutStream.write("LEFTDOW".getBytes(StandardCharsets.UTF_8));
+                            } catch (IOException e) {
+                                System.out.println("EXCEPTION" + e.getMessage());
+                                e.printStackTrace();
+                            }
+                    }
+                    old = newTime;
+                    break;
+
+                case MotionEvent.ACTION_UP:
+                    if (quantity == 0) {
+                        if (isAClick(oldClick, newTime)) {
                             if (mmOutStream != null)
                                 try {
-                                    System.out.println("LEFTDOWN");
-                                    mmOutStream.write("LEFTDOW".getBytes(StandardCharsets.UTF_8));
+                                    mmOutStream.write("LEFT2CL".getBytes(StandardCharsets.UTF_8));
+                                    System.out.println("DBLLEFTCLICK");
                                 } catch (IOException e) {
                                     System.out.println("EXCEPTION" + e.getMessage());
                                     e.printStackTrace();
                                 }
-                        }
-                    old = date.getTime();
-                    break;
-
-                case MotionEvent.ACTION_UP:
-                        if (quantity == 0) {
-                            if (isAClick(old, date.getTime())) {
-                                if (mmOutStream != null)
-                                    try {
-                                        mmOutStream.write("LEFTCLI".getBytes(StandardCharsets.UTF_8));
-                                        System.out.println("LEFTCLICK");
-                                    } catch (IOException e) {
-                                        System.out.println("EXCEPTION" + e.getMessage());
-                                        e.printStackTrace();
-                                    }
-                                old = date.getTime();
-                            } else {
-                                if (mmOutStream != null)
-                                    try {
-                                        mmOutStream.write("LEFTUPP".getBytes(StandardCharsets.UTF_8));
-                                        System.out.println("LEFTUP");
-                                    } catch (IOException e) {
-                                        e.printStackTrace();
-                                    }
-                            }
+                            oldClick = newTime;
+                            old = newTime;
+                        } else if (isAClick(old, newTime)) {
+                            if (mmOutStream != null)
+                                try {
+                                    mmOutStream.write("LEFTCLI".getBytes(StandardCharsets.UTF_8));
+                                    System.out.println("LEFTCLICK");
+                                } catch (IOException e) {
+                                    System.out.println("EXCEPTION" + e.getMessage());
+                                    e.printStackTrace();
+                                }
+                            oldClick = newTime;
+                            old = newTime;
                         } else {
-                            if (isAClick(old, date.getTime())) {
-                                if (mmOutStream != null)
-                                    try {
-                                        mmOutStream.write("RIGHTCL".getBytes(StandardCharsets.UTF_8));
-                                        System.out.println("RIGHTCLICK");
-                                    } catch (IOException e) {
-                                        System.out.println("EXCEPTION" + e.getMessage());
-                                        e.printStackTrace();
-                                    }
-                                old = date.getTime();
-                            }
+                            if (mmOutStream != null)
+                                try {
+                                    mmOutStream.write("LEFTUPP".getBytes(StandardCharsets.UTF_8));
+                                    System.out.println("LEFTUP");
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
                         }
-                        quantity = 0;
+                    } else {
+                        if (isAClick(old, newTime)) {
+                            if (mmOutStream != null)
+                                try {
+                                    mmOutStream.write("RIGHTCL".getBytes(StandardCharsets.UTF_8));
+                                    System.out.println("RIGHTCLICK");
+                                } catch (IOException e) {
+                                    System.out.println("EXCEPTION" + e.getMessage());
+                                    e.printStackTrace();
+                                }
+                            old = newTime;
+                        }
+                    }
+                    quantity = 0;
                     break;
 
                 case MotionEvent.ACTION_POINTER_DOWN:
                     scroll = event.getRawY();
-                    quantity =2;
+                    quantity = 2;
                     break;
                 case MotionEvent.ACTION_POINTER_UP:
                     quantity--;
                     break;
                 case MotionEvent.ACTION_MOVE:
-
-                    if ((quantity<2)&&(!isAClick(oldMove, date.getTime()))) {
+                    int general = 0;
+                    if ((quantity < 2) && (!isAClick(oldMove, date.getTime()))) {
                         float eventX = dX - event.getRawX();
                         float eventY = dY - event.getRawY();
                         System.out.println(eventX);
@@ -369,12 +402,14 @@ public class MainActivity extends AppCompatActivity {
                             int righti = Math.round((eventX));
                             if (righti > 99)
                                 righti = 99;
+                            general += righti;
                             commandStr = commandStr + "L" + String.format("%02d", righti);
 
                         } else if (eventX < 0) {
                             int lefti = -Math.round((eventX));
                             if (lefti > 99)
                                 lefti = 99;
+                            general += lefti;
                             commandStr = commandStr + "R" + String.format("%02d", lefti);
                         }
 
@@ -382,16 +417,18 @@ public class MainActivity extends AppCompatActivity {
                             int upi = Math.round((eventY));
                             if (upi > 99)
                                 upi = 99;
+                            general += upi;
                             commandStr = commandStr + "U" + String.format("%02d", upi);
                         } else if (eventY < 0) {
                             int downi = -Math.round((eventY));
                             if (downi > 99)
                                 downi = 99;
+                            general += downi;
                             commandStr = commandStr + "D" + String.format("%02d", downi);
                         }
 
                         System.out.println(commandStr);
-                        if (mmOutStream != null)
+                        if (mmOutStream != null && general != 0)
                             try {
                                 mmOutStream.write(commandStr.getBytes(StandardCharsets.UTF_8));
                             } catch (IOException e) {
@@ -400,36 +437,35 @@ public class MainActivity extends AppCompatActivity {
                             }
                         dX = event.getRawX();
                         dY = event.getRawY();
-                    }
-                    else{
-                            boolean isWasUp = false;
-                            oldMove = date.getTime();
-                            float eventScroll = scroll - event.getRawY();
-                            String commandStr = "SCRL";
-                            if (eventScroll >= 0) {
-                                int upi = Math.round((eventScroll));
-                                if (upi > 99)
-                                    upi = 99;
-                                if (upi == 99)
-                                    isWasUp = true;
-                                commandStr = commandStr + "U" + String.format("%02d", upi);
-                            } else if (eventScroll < 0) {
-                                int downi = -Math.round((eventScroll));
-                                if (downi > 99)
-                                    downi = 99;
-                                if (downi == 99)
-                                    isWasUp = true;
-                                commandStr = commandStr + "D" + String.format("%02d", downi);
+                    } else {
+                        boolean isWasUp = false;
+                        oldMove = date.getTime();
+                        float eventScroll = scroll - event.getRawY();
+                        String commandStr = "SCRL";
+                        if (eventScroll >= 0) {
+                            int upi = Math.round((eventScroll));
+                            if (upi > 99)
+                                upi = 99;
+                            if (upi == 99)
+                                isWasUp = true;
+                            commandStr = commandStr + "U" + String.format("%02d", upi);
+                        } else if (eventScroll < 0) {
+                            int downi = -Math.round((eventScroll));
+                            if (downi > 99)
+                                downi = 99;
+                            if (downi == 99)
+                                isWasUp = true;
+                            commandStr = commandStr + "D" + String.format("%02d", downi);
+                        }
+                        System.out.println(commandStr);
+                        if ((mmOutStream != null) && (!isWasUp))
+                            try {
+                                mmOutStream.write(commandStr.getBytes(StandardCharsets.UTF_8));
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                                System.out.println("EXCEPTION" + e.getMessage());
                             }
-                            System.out.println(commandStr);
-                            if ((mmOutStream != null) && (!isWasUp))
-                                try {
-                                    mmOutStream.write(commandStr.getBytes(StandardCharsets.UTF_8));
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                    System.out.println("EXCEPTION" + e.getMessage());
-                                }
-                            scroll = event.getRawY();
+                        scroll = event.getRawY();
                     }
                     break;
 
@@ -443,7 +479,6 @@ public class MainActivity extends AppCompatActivity {
         System.out.println(now-old);
         return !(now-old>150);
     }
-
 
     public void start_accepting_connection()
     {
@@ -532,7 +567,7 @@ public class MainActivity extends AppCompatActivity {
             mmInStream = tmpIn;
             mmOutStream = tmpOut;
             try {
-                mmOutStream.write("Startttttttt".getBytes(StandardCharsets.UTF_8));
+                mmOutStream.write("Starttt".getBytes(StandardCharsets.UTF_8));
                 Thread.sleep(1000);
             }
             catch (Exception e) {
@@ -543,13 +578,16 @@ public class MainActivity extends AppCompatActivity {
         public void run() {
             byte[] buffer = new byte[5];  // buffer store for the stream
             int bytes; // bytes returned from read()
-
+            boolean isThread = true;
             // Keep listening to the InputStream until an exception occurs
-            while (true) {
+            while (isThread) {
                 try {
                     bytes = mmInStream.read(buffer);
-                    if (Arrays.toString(buffer).equals("DISCO"))
+                    System.out.println(new String(buffer, StandardCharsets.UTF_8));
+                    if (new String(buffer, StandardCharsets.UTF_8).equals("DISCO")){
                         cancel();
+                        isThread = false;
+                    }
 
                 } catch (IOException e) {
                     System.out.println("EXCEPTION" +e.getMessage());
@@ -564,6 +602,8 @@ public class MainActivity extends AppCompatActivity {
                 mmInStream.close();
                 mmOutStream.close();
                 mmSocket.close();
+                mmOutStream = null;
+                System.out.println("close");
             } catch (IOException e) {
                 System.out.println("EXCEPTION" + e.getMessage());
             }
