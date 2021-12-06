@@ -308,6 +308,7 @@ public class MainActivity extends AppCompatActivity {
     float scroll;
     long old, oldMove, oldClick;
     int quantity = 0;
+    boolean isDown = false;
     View.OnTouchListener myTouchListener = new View.OnTouchListener(){
         @SuppressLint("DefaultLocale")
         @Override
@@ -324,6 +325,7 @@ public class MainActivity extends AppCompatActivity {
                     if (isAClick(old, newTime)) {
                         if (mmOutStream != null)
                             try {
+                                isDown = true;
                                 System.out.println("LEFTDOWN");
                                 mmOutStream.write("LEFTDOW".getBytes(StandardCharsets.UTF_8));
                             } catch (IOException e) {
@@ -358,9 +360,10 @@ public class MainActivity extends AppCompatActivity {
                                 }
                             oldClick = newTime;
                             old = newTime;
-                        } else {
+                        } else if (isDown){
                             if (mmOutStream != null)
                                 try {
+                                    isDown = false;
                                     mmOutStream.write("LEFTUPP".getBytes(StandardCharsets.UTF_8));
                                     System.out.println("LEFTUP");
                                 } catch (IOException e) {
@@ -585,6 +588,7 @@ public class MainActivity extends AppCompatActivity {
                     bytes = mmInStream.read(buffer);
                     System.out.println(new String(buffer, StandardCharsets.UTF_8));
                     if (new String(buffer, StandardCharsets.UTF_8).equals("DISCO")){
+
                         cancel();
                         isThread = false;
                     }
