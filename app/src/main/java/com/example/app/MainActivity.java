@@ -34,11 +34,8 @@ public class MainActivity extends AppCompatActivity {
     public static final int REQUEST_ENABLE_BT=1;
     BluetoothAdapter bluetoothAdapter;
     public static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
-    public static final int MESSAGE_READ=0;
-    public static final int MESSAGE_WRITE=1;
-    public static final int CONNECTING=2;
     public static final int CONNECTED=3;
-    public static final int NO_SOCKET_FOUND=4;
+    public static final int CLOSE=4;
     ConnectedThread connectedThread;
     private OutputStream mmOutStream;
     private boolean isCustomEnter;
@@ -52,26 +49,15 @@ public class MainActivity extends AppCompatActivity {
             super.handleMessage(msg_type);
 
             switch (msg_type.what){
-                case MESSAGE_READ:
-
-                    byte[] readbuf=(byte[])msg_type.obj;
-                    String string_recieved=new String(readbuf);
-
-                    //do some task based on recieved string
-
-                    break;
 
                 case CONNECTED:
                     Toast.makeText(getApplicationContext(),"Connected",Toast.LENGTH_SHORT).show();
                     break;
 
-                case CONNECTING:
-                    Toast.makeText(getApplicationContext(),"Connecting...",Toast.LENGTH_SHORT).show();
+                case CLOSE:
+                    Toast.makeText(getApplicationContext(),"Close",Toast.LENGTH_SHORT).show();
                     break;
 
-                case NO_SOCKET_FOUND:
-                    Toast.makeText(getApplicationContext(),"No socket found",Toast.LENGTH_SHORT).show();
-                    break;
             }
         }
     };
@@ -173,6 +159,7 @@ public class MainActivity extends AppCompatActivity {
         ((Button) findViewById(R.id.kaction)).setOnTouchListener(keyTouch);
         ((Button) findViewById(R.id.kesc)).setOnTouchListener(keyTouch);
         ((Button) findViewById(R.id.ke)).setOnTouchListener(keyTouch);
+        ((Button) findViewById(R.id.krmouse)).setOnTouchListener(keyTouch);
         isCustomEnter = false;
     }
 
@@ -485,7 +472,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void start_accepting_connection()
     {
-        //call this on button click as suited by you
 
         AcceptThread acceptThread = new AcceptThread();
         acceptThread.start();
@@ -496,8 +482,7 @@ public class MainActivity extends AppCompatActivity {
     {
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (bluetoothAdapter == null) {
-            // Device doesn't support Bluetooth
-            Toast.makeText(getApplicationContext(),"Your Device doesn't support bluetooth. you can play as Single player",Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(),"Your Device doesn't support bluetooth",Toast.LENGTH_SHORT).show();
             finish();
         }
         if (!bluetoothAdapter.isEnabled()) {
@@ -515,7 +500,6 @@ public class MainActivity extends AppCompatActivity {
         public AcceptThread() {
             BluetoothServerSocket tmp = null;
             try {
-                // MY_UUID is the app's UUID string, also used by the client code
                 tmp = bluetoothAdapter.listenUsingRfcommWithServiceRecord("NAME",MY_UUID);
             } catch (IOException e) {
                 System.out.println("EXCEPTION" +e.getMessage());
@@ -525,7 +509,6 @@ public class MainActivity extends AppCompatActivity {
 
         public void run() {
             BluetoothSocket socket = null;
-            // Keep listening until exception occurs or a socket is returned
             while (true) {
                 try {
                     socket = serverSocket.accept();
@@ -533,14 +516,13 @@ public class MainActivity extends AppCompatActivity {
                     System.out.println("EXCEPTION" +e.getMessage());
                     break;
                 }
-
-                // If a connection was accepted
                 if (socket != null)
                 {
-                    // Do work to manage the connection (in a separate thread)
-                    mHandler.obtainMessage(CONNECTED).sendToTarget();
-                    connectedThread=new ConnectedThread(socket);
-                    connectedThread.run();
+                    if (connectedThread==null) {
+                        mHandler.obtainMessage(CONNECTED).sendToTarget();
+                        connectedThread = new ConnectedThread(socket);
+                        connectedThread.run();
+                    }
                 }
             }
         }
@@ -557,9 +539,6 @@ public class MainActivity extends AppCompatActivity {
             mmSocket = socket;
             InputStream tmpIn = null;
             OutputStream tmpOut = null;
-
-            // Get the input and output streams, using temp objects because
-            // member streams are final
             try {
                 tmpIn = socket.getInputStream();
                 tmpOut = socket.getOutputStream();
@@ -579,10 +558,9 @@ public class MainActivity extends AppCompatActivity {
         }
 
         public void run() {
-            byte[] buffer = new byte[5];  // buffer store for the stream
-            int bytes; // bytes returned from read()
+            byte[] buffer = new byte[5];
+            int bytes;
             boolean isThread = true;
-            // Keep listening to the InputStream until an exception occurs
             while (isThread) {
                 try {
                     bytes = mmInStream.read(buffer);
@@ -595,12 +573,13 @@ public class MainActivity extends AppCompatActivity {
 
                 } catch (IOException e) {
                     System.out.println("EXCEPTION" +e.getMessage());
+                    cancel();
+                    isThread = false;
                     break;
                 }
             }
         }
 
-        /* Call this from the main activity to shutdown the connection */
         public void cancel() {
             try {
                 mmInStream.close();
@@ -608,6 +587,8 @@ public class MainActivity extends AppCompatActivity {
                 mmSocket.close();
                 mmOutStream = null;
                 System.out.println("close");
+                connectedThread = null;
+                mHandler.obtainMessage(CLOSE).sendToTarget();
             } catch (IOException e) {
                 System.out.println("EXCEPTION" + e.getMessage());
             }
