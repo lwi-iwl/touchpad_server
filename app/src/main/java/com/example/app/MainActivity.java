@@ -244,6 +244,11 @@ public class MainActivity extends AppCompatActivity {
                             e.printStackTrace();
                             System.out.println("EXCEPTION" + e.getMessage());
                         }
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                     break;
                 case MotionEvent.ACTION_UP:
                     oldKey = date.getTime();
@@ -259,6 +264,11 @@ public class MainActivity extends AppCompatActivity {
                             e.printStackTrace();
                             System.out.println("EXCEPTION" + e.getMessage());
                         }
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                     break;
                 default:
                     return false;
